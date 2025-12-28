@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from utils import ouvrir_fichier, nettoyer_donnees, calculer_score_succes
 from process import creer_clusters_films
 
-CHEMIN_DATA = "C:/Users/keita/Downloads/projet-film/data/DatasetFinal.csv"
+CHEMIN_DATA = "data\DatasetFinal.csv"
 
 # Chargement du fichier
 df_brut = ouvrir_fichier(CHEMIN_DATA)
