@@ -11,7 +11,7 @@ from utils import ouvrir_fichier, nettoyer_donnees, transformer_texte_en_chiffre
 from process import preparer_ia, selection_meilleures_colonnes, creer_clusters_films
 
 # Chemin vers le fichier CSV
-CHEMIN_DATA = "C:/Users/keita/Downloads/projet-film/data/DatasetFinal.csv"
+CHEMIN_DATA = "data\DatasetFinal.csv"
 
 # Chargement du fichier
 donnees = ouvrir_fichier(CHEMIN_DATA)
