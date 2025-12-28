@@ -1,110 +1,14 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
-<<<<<<< HEAD
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import r2_score, mean_squared_error
-
-# Import de nos fonctions personnalisées
-from utils import ouvrir_fichier, nettoyer_donnees, transformer_texte_en_chiffre, calculer_score_succes
-from process import preparer_ia, selection_meilleures_colonnes
-
-
-# Chemin vers le fichier CSV
-CHEMIN_DATA = "C:/Users/keita/Downloads/projet-film/data/DatasetFinal.csv"
-
-# Chargement du fichier
-donnees = ouvrir_fichier(CHEMIN_DATA)
-
-# Nettoyage des colonnes numériques (gestion des virgules et des vides)
-colonnes_num = ['budget', 'director_number', 'producer_number', 'production_companies_number', 'runtime']
-donnees = nettoyer_donnees(donnees, colonnes_num)
-
-# Transformation des colonnes textes en identifiants (IDs) pour le modèle
-colonnes_txt = ['cast', 'director', 'production_companies']
-donnees = transformer_texte_en_chiffre(donnees, colonnes_txt)
-
-# Création de notre indicateur de réussite (la "Target" y)
-donnees = calculer_score_succes(donnees)
-
-
-# On prépare les données (X) et la cible (y)
-X, y = preparer_ia(donnees)
-
-# On demande à l'algorithme de garder les variables les plus importantes
-X = selection_meilleures_colonnes(X, y, nb_colonnes=8)
-
-# Affichage des variables sélectionnées pour vérification
-print(f"Variables retenues pour le modèle : {list(X.columns)}")
-
-# Séparation : 80% pour entraîner le modèle , 20% pour tester sa précision
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-
-# Modèle 1 : Régression Linéaire (Modèle de base)
-modele_simple = LinearRegression()
-modele_simple.fit(X_train, y_train)
-pred_simple = modele_simple.predict(X_test)
-
-# Modèle 2 : Gradient Boosting (Modèle plus complexe)
-modele_complexe = GradientBoostingRegressor(n_estimators=100, random_state=42)
-modele_complexe.fit(X_train, y_train)
-pred_complexe = modele_complexe.predict(X_test)
-
-# Calcul des performances
-r2_simple = r2_score(y_test, pred_simple)
-r2_complexe = r2_score(y_test, pred_complexe)
-
-mse_simple = mean_squared_error(y_test, pred_simple)
-mse_complexe = mean_squared_error(y_test, pred_complexe)
-
-# Affichage des résultats dans la console
-print("\n" + "="*45)
-print(" BILAN DES PERFORMANCES ")
-print("="*45)
-print(f"Modèle Linéaire     R²: {r2_simple:.3f} | Erreur Quadratique : {mse_simple:.2f}")
-print(f"Gradient Boosting   R²: {r2_complexe:.3f} | Erreur Quadratique : {mse_complexe:.2f}")
-print("="*45)
-
-
-# GRAPHIQUE DES PRÉDICTIONS
-plt.figure(figsize=(10, 6))
-
-# Graphes des prédictions des deux modèles
-plt.scatter(y_test, pred_simple, color='orange', alpha=0.5, label=f'Linéaire (R²={r2_simple:.2f})')
-plt.scatter(y_test, pred_complexe, color='purple', alpha=0.5, label=f'Gradient Boosting (R²={r2_complexe:.2f})')
-
-# Ligne de référence : si les points sont sur cette ligne, le modèle a vu juste
-plt.plot([y.min(), y.max()], [y.min(), y.max()], color='red', linestyle='--', label='Prédiction Parfaite')
-
-plt.title("Capacité du modèle à prédire le succès (données réelles vs prédites)")
-plt.xlabel("Score de Succès Réel")
-plt.ylabel("Score de Succès Prédit")
-plt.legend()
-plt.grid(True, linestyle=':', alpha=0.6)
-
-# Sauvegarde automatique du graphique pour le README
-plt.savefig("resultat_predictions.png")
-print("Graphique enregistré sous : resultat_predictions.png")
-
-# Affichage final
-plt.show()
-=======
 from sklearn.model_selection import train_test_split, GridSearchCV
-=======
-from sklearn.model_selection import train_test_split
->>>>>>> 2777b94b (Ajout du module de visualisation L3)
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import r2_score, mean_squared_error
 
 # Import de nos fonctions personnalisées
 from utils import ouvrir_fichier, nettoyer_donnees, transformer_texte_en_chiffre, calculer_score_succes
-from process import preparer_ia, selection_meilleures_colonnes
-
+from process import preparer_ia, selection_meilleures_colonnes, creer_clusters_films
 
 # Chemin vers le fichier CSV
 CHEMIN_DATA = "C:/Users/keita/Downloads/projet-film/data/DatasetFinal.csv"
@@ -123,6 +27,8 @@ donnees = transformer_texte_en_chiffre(donnees, colonnes_txt)
 # Création de notre indicateur de réussite (la "Target" y)
 donnees = calculer_score_succes(donnees)
 
+# Ajout des groupes de films (Clustering) pour l'analyse de segmentation
+donnees, kmeans = creer_clusters_films(donnees, k=4)
 
 # On prépare les données (X) et la cible (y)
 X, y = preparer_ia(donnees)
@@ -130,135 +36,58 @@ X, y = preparer_ia(donnees)
 # On demande à l'algorithme de garder les variables les plus importantes
 X = selection_meilleures_colonnes(X, y, nb_colonnes=8)
 
-# Affichage des variables sélectionnées pour vérification
-print(f"Variables retenues pour le modèle : {list(X.columns)}")
-
 # Séparation : 80% pour entraîner le modèle , 20% pour tester sa précision
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
 
 # Modèle 1 : Régression Linéaire (Modèle de base)
 modele_simple = LinearRegression()
 modele_simple.fit(X_train, y_train)
 pred_simple = modele_simple.predict(X_test)
 
-# Modèle 2 : Gradient Boosting (Modèle plus complexe)
-modele_complexe = GradientBoostingRegressor(n_estimators=100, random_state=42)
-modele_complexe.fit(X_train, y_train)
-pred_complexe = modele_complexe.predict(X_test)
-
-# Calcul des performances
-r2_simple = r2_score(y_test, pred_simple)
-r2_complexe = r2_score(y_test, pred_complexe)
-
-mse_simple = mean_squared_error(y_test, pred_simple)
-mse_complexe = mean_squared_error(y_test, pred_complexe)
-
-# Affichage des résultats dans la console
-print("\n" + "="*45)
-print(" BILAN DES PERFORMANCES ")
-print("="*45)
-print(f"Modèle Linéaire     R²: {r2_simple:.3f} | Erreur Quadratique : {mse_simple:.2f}")
-print(f"Gradient Boosting   R²: {r2_complexe:.3f} | Erreur Quadratique : {mse_complexe:.2f}")
-print("="*45)
-
-
-# GRAPHIQUE DES PRÉDICTIONS
-plt.figure(figsize=(10, 6))
-
-# Graphes des prédictions des deux modèles
-plt.scatter(y_test, pred_simple, color='orange', alpha=0.5, label=f'Linéaire (R²={r2_simple:.2f})')
-plt.scatter(y_test, pred_complexe, color='purple', alpha=0.5, label=f'Gradient Boosting (R²={r2_complexe:.2f})')
-
-# Ligne de référence : si les points sont sur cette ligne, le modèle a vu juste
-plt.plot([y.min(), y.max()], [y.min(), y.max()], color='red', linestyle='--', label='Prédiction Parfaite')
-
-plt.title("Capacité du modèle à prédire le succès (données réelles vs prédites)")
-plt.xlabel("Score de Succès Réel")
-plt.ylabel("Score de Succès Prédit")
-plt.legend()
-plt.grid(True, linestyle=':', alpha=0.6)
-
-# Sauvegarde automatique du graphique pour le README
-plt.savefig("resultat_predictions_regresion.png")
-print("Graphique enregistré sous : resultat_predictions_regresion.png")
-
-<<<<<<< HEAD
-
-X = select_attributes(X, y, k=len(features))
-
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-lr = LinearRegression()
-lr.fit(X_train, y_train)
-y_pred_lr = lr.predict(X_test)
-print("\n===== RÉGRESSION LINÉAIRE =====")
-print("R² :", round(r2_score(y_test, y_pred_lr), 3))
-print("MSE :", round(mean_squared_error(y_test, y_pred_lr), 4))
-
-
+# Modèle 2 : Gradient Boosting (Modèle plus complexe avec optimisation)
 gbr = GradientBoostingRegressor(random_state=42)
 param_grid = {
     'n_estimators': [100, 200],
     'max_depth': [3, 5],
-    'learning_rate': [0.05, 0.1],
-    'subsample': [0.8, 1.0]
+    'learning_rate': [0.05, 0.1]
 }
-grid = GridSearchCV(
-    estimator=gbr,
-    param_grid=param_grid,
-    cv=3,
-    scoring='r2',
-    n_jobs=-1
-)
+grid = GridSearchCV(estimator=gbr, param_grid=param_grid, cv=3, n_jobs=-1)
 grid.fit(X_train, y_train)
-best_gbr = grid.best_estimator_
-y_pred_gbr = best_gbr.predict(X_test)
+modele_complexe = grid.best_estimator_
+pred_complexe = modele_complexe.predict(X_test)
 
-print("\n===== GRADIENT BOOSTING =====")
-print("R² :", round(r2_score(y_test, y_pred_gbr), 3))
-print("MSE :", round(mean_squared_error(y_test, y_pred_gbr), 4))
+# Calcul des performances
+r2_simple = r2_score(y_test, pred_simple)
+r2_complexe = r2_score(y_test, pred_complexe)
+mse_simple = mean_squared_error(y_test, pred_simple)
+mse_complexe = mean_squared_error(y_test, pred_complexe)
 
-def plot_prediction(y_true, y_pred, title):
-    r2 = r2_score(y_true, y_pred)
-    plt.figure(figsize=(7,7))
-    plt.scatter(y_true, y_pred, alpha=0.5)
-    min_val, max_val = y_true.min(), y_true.max()
-    plt.plot([min_val, max_val], [min_val, max_val], linestyle='--', color='black')
-    coef = np.polyfit(y_true, y_pred, 1)
-    trend = np.poly1d(coef)
-    plt.plot(np.linspace(min_val, max_val, 100), trend(np.linspace(min_val, max_val, 100)), color='red', linewidth=2)
-    plt.xlabel("Succès réel")
-    plt.ylabel("Succès prédit")
-    plt.title(f"{title} | R² = {r2:.3f}")
-    plt.grid(alpha=0.3)
-    plt.show()
-    return r2
+# Affichage des résultats finaux
+print("\n" + "="*45)
+print(" BILAN DES PERFORMANCES ")
+print("="*45)
+print(f"Modèle Linéaire      R²: {r2_simple:.3f} | Erreur Quadratique : {mse_simple:.2f}")
+print(f"Gradient Boosting    R²: {r2_complexe:.3f} | Erreur Quadratique : {mse_complexe:.2f}")
+print("="*45)
 
-plot_prediction(y_test, y_pred_lr, "Régression Linéaire — Succès réel vs prédit")
-plot_prediction(y_test, y_pred_gbr, "Gradient Boosting — Succès réel vs prédit")
+# GRAPHIQUE DES PRÉDICTIONS
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, pred_simple, color='orange', alpha=0.5, label=f'Linéaire (R²={r2_simple:.2f})')
+plt.scatter(y_test, pred_complexe, color='purple', alpha=0.5, label=f'Gradient Boosting (R²={r2_complexe:.2f})')
+plt.plot([y.min(), y.max()], [y.min(), y.max()], color='red', linestyle='--', label='Prédiction Parfaite')
 
+plt.title("Capacité du modèle à prédire le succès (données réelles vs prédites)")
+plt.xlabel("Score de Succès Réel")
+plt.ylabel("Score de Succès Prédit")
+plt.legend()
+plt.grid(True, linestyle=':', alpha=0.6)
 
-cluster_counts = df['cluster'].value_counts().sort_index()
-cluster_percent = cluster_counts / cluster_counts.sum() * 100
-plt.figure(figsize=(8,5))
-plt.bar(cluster_percent.index.astype(str), cluster_percent.values)
-plt.xlabel("Cluster")
-plt.ylabel("Proportion (%)")
-plt.title("Proportion des films par cluster")
-plt.grid(axis='y', alpha=0.3)
-for i, val in enumerate(cluster_percent.values):
-    plt.text(i, val + 0.5, f"{val:.1f}%", ha='center')
-plt.tight_layout()
-plt.show()
+plt.savefig("resultat_predictions.png")
+print("Graphique enregistré : resultat_predictions.png")
 
-# =========================
-# DONUT — PROPORTIONS DES CLUSTERS
-# =========================
+# VISUALISATION DES CLUSTERS (DONUT)
 plt.figure(figsize=(7,7))
+cluster_counts = donnees['cluster'].value_counts().sort_index()
 plt.pie(
     cluster_counts.values,
     labels=[f"Cluster {c}" for c in cluster_counts.index],
@@ -269,30 +98,8 @@ plt.pie(
 plt.title("Répartition des films par cluster")
 plt.axis('equal')
 plt.tight_layout()
+
+plt.savefig("repartition_clusters.png")
+print("Graphique enregistré : repartition_clusters.png")
+
 plt.show()
-
-
-threshold = df['succes_score'].median()
-df['success_category'] = np.where(df['succes_score'] >= threshold, 'Gros succès', 'Petit succès')
-gros = df[df['success_category'] == 'Gros succès']
-petit = df[df['success_category'] == 'Petit succès']
-
-
-plt.figure(figsize=(12,5))
-plt.subplot(1,2,1)
-plt.hist(gros['succes_score'], bins=20, color='orange', edgecolor='black')
-plt.title("Gros succès")
-plt.xlabel("Score de succès")
-plt.ylabel("Nombre de films")
-plt.subplot(1,2,2)
-plt.hist(petit['succes_score'], bins=20, color='lightgreen', edgecolor='black')
-plt.title("Petit succès")
-plt.xlabel("Score de succès")
-plt.ylabel("Nombre de films")
-plt.tight_layout()
-plt.show()
->>>>>>> 2410ef01 (Ajout du module de visualisation)
-=======
-# Affichage final
-plt.show()
->>>>>>> 2777b94b (Ajout du module de visualisation L3)
