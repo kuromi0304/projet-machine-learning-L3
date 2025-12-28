@@ -2,74 +2,110 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
+
 def ouvrir_fichier(chemin):
-    """
-    But : Lire le fichier CSV.
-    Entrée : chemin vers le fichier.
-    Sortie : Le tableau de données (DataFrame).
-    """
+    """Lire un fichier CSV et retourner un DataFrame."""
     return pd.read_csv(chemin, low_memory=False)
 
-def nettoyer_donnees(tab, colonnes_chiffres):
+
+def nettoyer_donnees(tab, colonnes_chiffres=None):
+    """Convertit des colonnes numériques et comble les NaN.
+
+    colonnes_chiffres: liste ou None. Si None, aucune conversion n'est faite.
     """
-    But : Transformer les textes en nombres et boucher les trous (NaN).
-    Entrée : tab (tableau), colonnes_chiffres (liste des noms de colonnes).
-    Sortie : Tableau propre.
-    """
-    for col in colonnes_chiffres:
-        if col in tab.columns:
-            # On remplace les virgules par des points et on force le type float
-            tab[col] = pd.to_numeric(tab[col].astype(str).str.replace(',', '.'), errors='coerce')
-            # On remplace les valeurs vides par la médiane pour ne pas fausser les calculs
-            tab[col] = tab[col].fillna(tab[col].median())
-    
-    # On garde seulement les films avec un budget minimum
+    if colonnes_chiffres:
+        for col in colonnes_chiffres:
+            if col in tab.columns:
+                tab[col] = pd.to_numeric(
+                    tab[col].astype(str).str.replace(',', '.'),
+                    errors='coerce'
+                )
+                tab[col] = tab[col].fillna(tab[col].median())
+
     if 'budget' in tab.columns:
         tab = tab[tab['budget'] > 1000].copy()
+
     return tab
 
+
 def transformer_texte_en_chiffre(tab, colonnes_texte):
-    """
-    But : Transformer les catégories en numéros.
-    Outil : LabelEncoder (donne un ID unique à chaque texte).
-    """
+    """Encode des colonnes catégorielles en entiers avec LabelEncoder."""
     for col in colonnes_texte:
         if col in tab.columns:
             tab[col] = tab[col].astype(str).fillna('Inconnu')
-            codeur = LabelEncoder()
-            tab[col] = codeur.fit_transform(tab[col])
+            le = LabelEncoder()
+            tab[col] = le.fit_transform(tab[col])
     return tab
 
-def calculer_score_succes(tab):
-    """
-    But : Créer notre indicateur de réussite (Score de 0 à 100).
-    Logique : Mélange des moyens mis en œuvre et de la réception du public.
-    """
-    # On utilise log1p pour que les énormes budgets ne cassent pas l'échelle
-    score_budget = 0.5 * np.log1p(tab['budget'])
-    # On additionne le nombre de producteurs et de boites de prod
-    force_prod = 0.3 * (tab['producer_number'] + tab['production_companies_number'])
-    # On ajoute le poids du réalisateur
-    poids_tech = 0.2 * tab['director_number']
-    
-    potentiel = score_budget + force_prod + poids_tech
 
-    # Calcul du succès réel (si les colonnes revenue/popularity existent)
-    if 'revenue' in tab.columns and 'popularity' in tab.columns:
-        revenue_log = np.log1p(tab['revenue'])
-        pop_norm = (tab['popularity'] - tab['popularity'].min()) / (tab['popularity'].max() - tab['popularity'].min())
-        vote_norm = tab['vote_average'] / 10 if 'vote_average' in tab.columns else 0.5
-        
-        succes_reel = (0.5 * revenue_log) + (0.3 * pop_norm) + (0.2 * vote_norm)
-        # Moyenne entre le potentiel et le succès réel
-        tab['score_final'] = (potentiel + succes_reel) / 2
-    else:
-        tab['score_final'] = potentiel
-    
-    # On ramène tout entre 0 et 100 (Normalisation Min-Max)
+def calculer_score_succes(tab):
+    """Calcule un indicateur de succès (0-100) basé sur budget, producteurs, réalisateur.
+
+    Nécessite les colonnes :
+    'budget', 'producer_number', 'production_companies_number', 'director_number'
+    """
+    required = [
+        'budget',
+        'producer_number',
+        'production_companies_number',
+        'director_number'
+    ]
+
+    for c in required:
+        if c not in tab.columns:
+            raise KeyError(f"Colonne requise manquante : {c}")
+
+    score_budget = 0.5 * np.log1p(tab['budget'])
+    force_prod = 0.3 * (
+        tab['producer_number'] + tab['production_companies_number']
+    )
+    poids_tech = 0.2 * tab['director_number']
+
+    tab['score_final'] = score_budget + force_prod + poids_tech
+
     mini = tab['score_final'].min()
     maxi = tab['score_final'].max()
-    tab['score_final'] = 100 * (tab['score_final'] - mini) / (maxi - mini)
-    
-    # Supprimer les lignes avec score non calculable
-    return tab.dropna(subset=['score_final'])
+
+    if pd.isna(mini) or pd.isna(maxi) or maxi == mini:
+        tab['score_final'] = 0
+    else:
+        tab['score_final'] = 100 * (
+            tab['score_final'] - mini
+        ) / (maxi - mini)
+
+    return tab
+
+
+def compute_succes_score(df):
+    """Alternative : combine revenue, popularity et vote_average (NON utilisée pour le ML)."""
+    if 'revenue' in df.columns:
+        df['revenue_log'] = np.log1p(df['revenue'])
+    else:
+        df['revenue_log'] = 0
+
+    if 'popularity' in df.columns:
+        pop_min = df['popularity'].min()
+        pop_max = df['popularity'].max()
+        if pop_max == pop_min:
+            df['popularity_norm'] = 0
+        else:
+            df['popularity_norm'] = (
+                df['popularity'] - pop_min
+            ) / (pop_max - pop_min)
+    else:
+        df['popularity_norm'] = 0
+
+    df['vote_norm'] = (
+        df['vote_average'] / 10
+        if 'vote_average' in df.columns
+        else 0
+    )
+
+    df['succes_score'] = (
+        0.5 * df['revenue_log']
+        + 0.3 * df['popularity_norm']
+        + 0.2 * df['vote_norm']
+    )
+
+    df = df.dropna(subset=['succes_score'])
+    return df
