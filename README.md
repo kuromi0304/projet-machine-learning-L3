@@ -75,4 +75,20 @@ Une fois le script terminé, vous obtiendrez :
 
     Features (Variables) : Le modèle apprend principalement à partir du Budget, du nombre de films du Réalisateur (director_number), des Producteurs (producer_number) et de la durée (runtime).
 
+🔗 Références et Sources
+
+Certaines méthodes avancées et logiques mathématiques utilisées dans ce code (notamment pour le Clustering et la Prédiction de Revenus) s'inspirent des ressources techniques suivantes :
+
+    Approche Clustering & Unsupervised Learning :
+
+        https://github.com/ajitmane36/Netflix-Movies-and-Tv-Shows-Clustering-ML-Unsupervised/tree/main
+
+        Utilisé pour comprendre la segmentation des données.
+
+    Méthodologie de Prédiction de Revenus :
+
+        https://github.com/Vikranth3140/Movie-Revenue-Prediction?utm_source=chatgpt.com
+
+        Référence pour l'analyse des features et les modèles de régression.
+
 Projet réalisé dans le cadre académique (L3).
