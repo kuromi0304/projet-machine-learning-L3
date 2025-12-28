@@ -1,7 +1,7 @@
-# 1. On ignore tout par défaut (fichiers persos, Lib/, cache, etc.)
+# 1. On ignore tout par défaut
 *
 
-# 2. On autorise les scripts Python essentiels
+# 2. On garde les scripts Python
 !main.py
 !visualisation.py
 !utils.py
@@ -11,8 +11,10 @@
 # 3. Gestion du dossier DATA
 !data/
 
-# IMPORTANT : On bloque les fichiers CSV car GitHub refuse les fichiers > 100 Mo
+# On bloque les CSV en général (pour éviter le fichier de 127Mo)
 data/*.csv
 
-# On autorise uniquement les fichiers ZIP (pour tes données compressées)
-!data/*.zip
+# ON FORCE l'ajout de tes 3 fichiers spécifiques
+!data/DatasetFinal.csv
+!data/AllMoviesDetailsCleaned.zip
+!data/AllMoviesCastingRaw.csv
