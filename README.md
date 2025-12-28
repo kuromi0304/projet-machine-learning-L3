@@ -1,76 +1,78 @@
 # 🎬 Prédiction du Succès des Films (Machine Learning)
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Library](https://img.shields.io/badge/Lib-Scikit--Learn-orange)
-![Status](https://img.shields.io/badge/Status-Validé-green)
+Ce projet de Machine Learning a pour objectif de prédire un **score de succès** pour des films, en se basant sur leurs caractéristiques techniques (budget, réalisateur, producteurs, durée) et en utilisant des algorithmes d'apprentissage supervisé.
 
-> **Objectif :** Estimer le potentiel commercial et critique d'un film **avant sa sortie** en utilisant l'Intelligence Artificielle, sans utiliser de données futures (Anti-Data Leakage).
+## 🚀 Installation et Lancement
 
----
-
-## 🚀 Démarrage Rapide
-
-### 1. Installation
-Assurez-vous d'avoir les librairies nécessaires :
+### 1. Pré-requis
+Le projet nécessite **Python** et les librairies suivantes. Vous pouvez les installer via le terminal :
 
 ```bash
 pip install pandas numpy matplotlib scikit-learn
 
-2. Lancer l'analyse
+2. Exécuter le projet
 
-Le projet est entièrement automatisé. Exécutez simplement :
+Le projet est conçu pour fonctionner avec une seule commande. Placez-vous dans le dossier du projet et lancez :
 Bash
 
 python main.py
 
-📂 Résultat : Le script va nettoyer les données, entraîner les modèles et générer automatiquement le graphique resultat_predictions.png dans le dossier courant.
-🏗️ Architecture du Projet
+Assurez-vous que le fichier de données est bien situé dans data/DatasetFinal.csv.
+📂 Organisation du Code
 
-Le code est modulaire pour respecter les bonnes pratiques de développement :
-Fichier	Rôle Principal
-main.py	Exécutable. Pilote le chargement, l'entraînement et la sauvegarde des résultats.
-process.py	Intelligence. Prépare les données (X, y) et filtre les variables pour éviter la triche (Data Leakage).
-utils.py	Outils. Gère le nettoyage des données, le formatage des nombres et le calcul du score cible.
-🧠 Méthodologie IA
+Le projet est structuré en trois modules pour séparer les responsabilités :
+1. main.py (Programme Principal)
 
-Nous comparons deux approches pour prédire le score :
+C'est le fichier exécutable. Il orchestre tout le processus :
 
-    Régression Linéaire : Modèle de référence (Baseline).
+    Chargement des données.
 
-    Gradient Boosting : Modèle avancé (Non-linéaire, souvent plus performant).
+    Appel des fonctions de nettoyage et de transformation.
 
-🛡️ Stratégie Anti-Triche (Data Leakage)
+    Entraînement des deux modèles (Régression Linéaire et Gradient Boosting).
 
-Pour garantir une prédiction réaliste, nous excluons volontairement les données connues uniquement après la sortie :
+    Affichage des performances (R² et MSE).
 
-    ❌ Revenu Box-Office
+    Génération et sauvegarde du graphique des prédictions.
 
-    ❌ Popularité
+2. utils.py (Boîte à outils)
 
-    ❌ Notes des spectateurs
+Contient les fonctions de gestion de données :
 
-Nous utilisons uniquement les données de production (disponibles avant la sortie) :
+    ouvrir_fichier : Chargement du CSV.
 
-    ✅ Budget
+    nettoyer_donnees : Gestion des valeurs manquantes et formatage des nombres.
 
-    ✅ Casting & Équipe technique (Réalisateur, Producteurs - transformés en IDs)
+    transformer_texte_en_chiffre : Encodage des colonnes textes (Réalisateurs, Acteurs) en identifiants numériques.
 
-    ✅ Durée (Runtime) & Saisonnalité
+    calculer_score_succes : Création de la variable cible (Target) score_final.
 
-🔗 Références & Crédits
+3. process.py (Cerveau IA)
 
-Ce projet s'inspire de méthodes avancées de Feature Engineering et de Clustering issues de la recherche open-source :
+Contient la logique de préparation pour le Machine Learning :
 
-    Clustering & Segmentation :
+    preparer_ia : Sépare les variables explicatives (X) de la cible (y), supprime les colonnes inutiles ou tricheuses (revenu, vote, popularité) et standardise les données.
 
-        Netflix Movies & TV Shows Clustering
+    selection_meilleures_colonnes : Utilise un test statistique (f_regression) pour ne garder que les variables les plus pertinentes pour le modèle.
 
-        Utilisé pour comprendre la segmentation des données.
+📊 Résultats et Sorties
 
-    Prédiction de Revenus :
+Une fois le script terminé, vous obtiendrez :
 
-        Movie Revenue Prediction
+    Dans la console : Un bilan comparatif des performances.
 
-        Référence pour l'analyse des features et les modèles de régression.
+        Exemple : Modèle Linéaire R²: 0.45 | Gradient Boosting R²: 0.52
+
+    Un fichier image : resultat_predictions.png
+
+        Ce graphique compare le score de succès réel (axe X) avec le score prédit par les modèles (axe Y). Plus les points sont proches de la ligne rouge, meilleure est la prédiction.
+
+🧠 Méthodologie
+
+    Algorithmes utilisés : Régression Linéaire (Baseline) et Gradient Boosting Regressor (Modèle avancé).
+
+    Target (Cible) : Le score_final est un indicateur calculé combinant l'impact du budget et la puissance de l'équipe de production.
+
+    Features (Variables) : Le modèle apprend principalement à partir du Budget, du nombre de films du Réalisateur (director_number), des Producteurs (producer_number) et de la durée (runtime).
 
 Projet réalisé dans le cadre académique (L3).
