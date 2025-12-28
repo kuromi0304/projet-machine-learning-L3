@@ -54,7 +54,7 @@ def calculer_score_succes(tab):
     
     potentiel = score_budget + force_prod + poids_tech
 
-    # 2. Calcul du succès réel (si les colonnes revenue/popularity existent)
+    # Calcul du succès réel (si les colonnes revenue/popularity existent)
     if 'revenue' in tab.columns and 'popularity' in tab.columns:
         revenue_log = np.log1p(tab['revenue'])
         pop_norm = (tab['popularity'] - tab['popularity'].min()) / (tab['popularity'].max() - tab['popularity'].min())
