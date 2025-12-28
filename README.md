@@ -18,6 +18,7 @@ Le projet est conçu pour fonctionner avec une seule commande. Placez-vous dans 
 python main.py
 ```
 Assurez-vous que le fichier de données est bien situé dans data/DatasetFinal.csv.
+
 📂 Organisation du Code
 
 Le projet est structuré en trois modules pour séparer les responsabilités :
