@@ -85,21 +85,3 @@ plt.grid(True, linestyle=':', alpha=0.6)
 plt.savefig("resultat_predictions.png")
 print("Graphique enregistré : resultat_predictions.png")
 
-# VISUALISATION DES CLUSTERS (DONUT)
-plt.figure(figsize=(7,7))
-cluster_counts = donnees['cluster'].value_counts().sort_index()
-plt.pie(
-    cluster_counts.values,
-    labels=[f"Cluster {c}" for c in cluster_counts.index],
-    autopct='%1.1f%%',
-    startangle=90,
-    wedgeprops=dict(width=0.4)
-)
-plt.title("Répartition des films par cluster")
-plt.axis('equal')
-plt.tight_layout()
-
-plt.savefig("repartition_clusters.png")
-print("Graphique enregistré : repartition_clusters.png")
-
-plt.show()
