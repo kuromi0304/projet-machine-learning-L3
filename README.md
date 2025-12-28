@@ -9,14 +9,14 @@ Le projet nécessite **Python** et les librairies suivantes. Vous pouvez les ins
 
 ```bash
 pip install pandas numpy matplotlib scikit-learn
-
+```
 2. Exécuter le projet
 
 Le projet est conçu pour fonctionner avec une seule commande. Placez-vous dans le dossier du projet et lancez :
-Bash
+```bash
 
 python main.py
-
+```
 Assurez-vous que le fichier de données est bien situé dans data/DatasetFinal.csv.
 📂 Organisation du Code
 
